@@ -1,0 +1,35 @@
+# Its own workspace root, so this repository builds on its own.
+[workspace]
+
+[package]
+name = "xmip-core-contract-rust"
+version = "0.1.0"
+edition = "2024"
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/IlleNilsson/xmip-core-contract-rust"
+description = "Content contract authored as a loadable Rust module over the Xmip ABI: the entrypoint, the contract table and the lifecycle a Rust author starts from. A xmip-core-contract technology."
+publish = false
+
+[lib]
+path = "src/lib.rs"
+# A loadable module for the host, and a library so the tests can drive the
+# entrypoint without a loader.
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# The binding crate over include/xmip_module.h (ADR-0012 clause 10). A
+# convenience, never the boundary: the header is what this module conforms to.
+xmip_core_abi = { package = "xmip-core-abi", git = "https://github.com/IlleNilsson/xmip-core-abi", branch = "main" }
+
+[lints.rust]
+# The one purpose of this crate is to stand on the far side of the C boundary.
+unsafe_code = "allow"
+
+[lints.clippy]
+too_many_lines = "warn"
+pedantic = { level = "warn", priority = -1 }
+missing_errors_doc = "warn"
+missing_panics_doc = "warn"
+missing_safety_doc = "warn"
+unwrap_used = "warn"
+expect_used = "allow"

@@ -333,7 +333,7 @@ mod tests {
             status::OK
         );
         let mut source = Source {
-            bytes: b"xmip ping-pong",
+            bytes: b"xmip round-trip",
             at: 0,
         };
         let reader = Reader {

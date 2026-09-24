@@ -17,13 +17,16 @@ path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-# What a provider builds against: the contract trait, and the export that gives
-# this crate its entry point and table, and the Stream it judges; the only
-# Xmip crate a provider depends on (ADR-0061).
-sdk = { package = "xmip-core-sdk", git = "https://github.com/IlleNilsson/xmip-core-sdk", branch = "main" }
+# The contract trait, and the export that gives this crate its entry point and
+# table: what a provider's Rust contract depends on too.
+contract = { package = "xmip-core-contract", git = "https://github.com/IlleNilsson/xmip-core-contract", branch = "main" }
+stream = { package = "xmip-core-stream", git = "https://github.com/IlleNilsson/xmip-core-stream", branch = "main" }
+
+[dev-dependencies]
+xcore = { package = "xmip-core", git = "https://github.com/IlleNilsson/xmip-core", branch = "main" }
 
 [lints.rust]
-# A provider's crate writes no unsafe: the SDK's export stands on the C
+# A provider's crate writes no unsafe: the capability's export stands on the C
 # boundary for it (ADR-0061, decision 8).
 unsafe_code = "forbid"
 

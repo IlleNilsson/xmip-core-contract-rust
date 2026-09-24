@@ -17,13 +17,15 @@ path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-# The binding crate over include/xmip_module.h (ADR-0012 clause 10). A
-# convenience, never the boundary: the header is what this module conforms to.
-xmip_core_abi = { package = "xmip-core-abi", git = "https://github.com/IlleNilsson/xmip-core-abi", branch = "main" }
+# What a provider builds against: the contract trait, and the export that gives
+# this crate its entry point and table, and the Stream it judges; the only
+# Xmip crate a provider depends on (ADR-0061).
+sdk = { package = "xmip-core-sdk", git = "https://github.com/IlleNilsson/xmip-core-sdk", branch = "main" }
 
 [lints.rust]
-# The one purpose of this crate is to stand on the far side of the C boundary.
-unsafe_code = "allow"
+# A provider's crate writes no unsafe: the SDK's export stands on the C
+# boundary for it (ADR-0061, decision 8).
+unsafe_code = "forbid"
 
 [lints.clippy]
 too_many_lines = "warn"

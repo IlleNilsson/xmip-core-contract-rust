@@ -22,6 +22,7 @@ use contract::{
     Contract, ContractDescriptor, ContractError, ContractFactory, ContractId, ValidationResult,
 };
 use stream::Stream;
+use xcore::settings::{Applies, Kind, Presence, Setting, Settings};
 
 /// Every Stream holds: the identity contract.
 pub struct Held(ContractDescriptor);
@@ -48,6 +49,10 @@ impl ContractFactory for Factory {
         "rust"
     }
 
+    fn settings(&self) -> &'static Settings {
+        SETTINGS
+    }
+
     fn load(&self, _reference: &str) -> Result<Box<dyn Contract>, ContractError> {
         Ok(Box::new(Held(ContractDescriptor {
             id: ContractId("rust".to_string()),
@@ -56,6 +61,18 @@ impl ContractFactory for Factory {
         })))
     }
 }
+
+/// What a Location gives this contract (ADR-0064, amendment 2026-09-26).
+const SETTINGS: &Settings = &Settings {
+    technology: env!("CARGO_PKG_NAME"),
+    settings: &[Setting {
+        name: "reference",
+        kind: Kind::Text,
+        presence: Presence::Optional,
+        meaning: "Any descriptor; the identity contract holds every Stream whatever it names.",
+        applies: Applies::Both,
+    }],
+};
 
 contract::export_contract!(
     Factory,
@@ -74,5 +91,30 @@ mod tests {
         assert_eq!(contract.descriptor().id.0, "rust");
         let stream = Stream::new(xcore::StreamId::new(1), vec![0xff, 0], None);
         assert!(contract.validate(&stream).expect("judged").valid);
+    }
+
+    #[test]
+    fn rust_declares_its_settings_and_reads_through_them() {
+        assert!(SETTINGS.problems().is_empty(), "{:?}", SETTINGS.problems());
+        let given = |name: &str, value: &str| {
+            (
+                name.to_string(),
+                xcore::settings::Given::Text(value.to_string()),
+            )
+        };
+        assert!(Factory.open(Applies::Both, &[]).is_ok(), "bare");
+        let bound = Factory
+            .open(Applies::Receive, &[given("reference", "any")])
+            .expect("bound");
+        assert!(bound.descriptor().id.0.contains("rust"));
+        let refused = Factory
+            .open(Applies::Send, &[given("unheard_of", "x")])
+            .err()
+            .expect("an unknown setting is refused");
+        assert!(
+            refused.message.contains("unheard_of"),
+            "{}",
+            refused.message
+        );
     }
 }

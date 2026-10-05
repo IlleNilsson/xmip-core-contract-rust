@@ -3,8 +3,8 @@
 //! The Rust content contract — a technology of `xmip-core-contract`, as a
 //! loadable module rather than a crate the runtime links.
 //!
-//! ADR-0042 decision 3: a contract may be authored in any declared language
-//! over the C ABI, and this is the Rust one. It is what a provider writes: a
+//! ADR-0042 decision 3: a contract is authored in Rust, or in .NET, over the
+//! C ABI, and this is the Rust one. It is what a provider writes: a
 //! [`ContractFactory`], and one line naming it to the contract capability's
 //! export, which supplies the entry point, the contract table and the
 //! lifecycle. No `unsafe` is written here, and a module shipped this way is a

@@ -2,7 +2,7 @@
 
 A content contract authored in Rust, as a loadable module over the ABI rather than a crate the runtime links. A technology of
 [xmip-core-contract](https://github.com/IlleNilsson/xmip-core-contract); ADR-0042
-decision 3 admits a contract in any declared language, and ADR-0012 makes
+decision 3 (amendment 2026-10-05) admits a contract in Rust or .NET, and ADR-0012 makes
 `include/xmip_module.h` in xmip-core-abi the boundary it conforms to.
 
 What it claims today: well-formedness is bytes, every Stream is read to its end
@@ -13,6 +13,6 @@ are done.
 
 ## Verification
 
-`verify.ps1` is the gate xgit runs: it builds the loadable library and drives
-it through a probe written against the header's own types. It needs the
-toolchain `prerequisite.toml` declares for this language.
+xgit builds and tests it with cargo like any crate. The runtime's
+`ffi::loaded_contract` tests then open the built library through the host's
+loader and hold it to the contract table (ADR-0057).
